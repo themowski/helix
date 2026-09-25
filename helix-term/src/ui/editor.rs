@@ -1246,7 +1246,7 @@ impl EditorView {
                     let prev_view_id = view!(editor).id;
                     let doc = doc_mut!(editor, &view!(editor, view_id).doc);
 
-                    if modifiers == KeyModifiers::ALT {
+                    if modifiers == KeyModifiers::CONTROL {
                         let selection = doc.selection(view_id).clone();
                         doc.set_selection(view_id, selection.push(Range::point(pos)));
                     } else if editor.mode == Mode::Select {
