@@ -1249,7 +1249,9 @@ impl EditorView {
 
                     let doc = doc_mut!(editor, &view!(editor, view_id).doc);
 
-                    if modifiers == KeyModifiers::CONTROL {
+                    // Check whether any of the current modifiers matches the
+                    // multicursor click config, and add a cursor if so.
+                    if modifiers == config.multicursor_click_modifier.into() {
                         let selection = doc.selection(view_id).clone();
                         doc.set_selection(view_id, selection.push(Range::point(pos)));
                     } else if editor.mode == Mode::Select {
