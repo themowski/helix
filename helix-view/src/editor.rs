@@ -8,7 +8,7 @@ use crate::{
     graphics::{CursorKind, Rect},
     handlers::Handlers,
     info::Info,
-    input::KeyEvent,
+    input::{KeyEvent, KeyModifiers},
     register::Registers,
     theme::{self, Theme},
     tree::{self, Tree},
@@ -302,6 +302,9 @@ pub struct Config {
     pub mouse: bool,
     /// Which register to use for mouse yank.
     pub mouse_yank_register: char,
+    /// Controls the key that, when held, will cause a left mouse click to
+    /// place an additional cursor.
+    pub multicursor_click_modifier: MultiCursorClickModifierConfig,
     /// Shell to use for shell commands. Defaults to ["cmd", "/C"] on Windows and ["sh", "-c"] otherwise.
     pub shell: Vec<String>,
     /// Line number mode.
@@ -510,6 +513,26 @@ impl Config {
                 .statusline
                 .right
                 .contains(&StatusLineElement::CodeActionHint)
+    }
+}
+
+/// Multicursor key modifier configuration.
+#[derive(Default, Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum MultiCursorClickModifierConfig {
+    /// Alt key
+    #[default]
+    ALT,
+    /// Ctrl key
+    CTRL,
+}
+
+impl From<MultiCursorClickModifierConfig> for KeyModifiers {
+    fn from(m: MultiCursorClickModifierConfig) -> Self {
+        match m {
+            MultiCursorClickModifierConfig::ALT => KeyModifiers::ALT,
+            MultiCursorClickModifierConfig::CTRL => KeyModifiers::CONTROL,
+        }
     }
 }
 
@@ -1179,6 +1202,7 @@ impl Default for Config {
             scroll_lines: 3,
             mouse: true,
             mouse_yank_register: '*',
+            multicursor_click_modifier: MultiCursorClickModifierConfig::default(),
             shell: if cfg!(windows) {
                 vec!["cmd".to_owned(), "/C".to_owned()]
             } else {
